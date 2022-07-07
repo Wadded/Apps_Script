@@ -1,0 +1,1 @@
+var resposta = Browser.msgBox('Confirmação','Isto irá enviar os dados para a outra planilha e apagar os dados, deseja continuar?',Browser.Buttons.YES_NO);
