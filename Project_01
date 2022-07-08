@@ -1,0 +1,448 @@
+let app = SpreadsheetApp.getActiveSpreadsheet();
+let Novo = app.getSheetByName("Registrar Lote");
+let Lotes = app.getSheetByName("Lotes");
+let Aberto =app.getActiveSheet();
+let NewDiario = app.getSheetByName("NewDiario");
+let Hist = app.getSheetByName("Histórico");
+let old_diario = app.getSheetByName("DIARIO");
+let Diario = app.getSheetByName("Diário");
+let Ref = app.getSheetByName("Ref0");
+let Meses=["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"];
+let alfa =["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+
+
+function veryfast(){
+  /*
+  for(x=1;x<=31;x++){
+    var end1 = columnToLetter(7+(21*(x-1)))
+    //var end2 = columnToLetter(10+(21*(x-1)))
+    Diario.getRange(end1+'1:'+end1).clearDataValidations();
+    
+  }
+  */
+  Logger.log(Diario.getConditionalFormatRules().length)
+};
+
+function Formatacao_Padrao_Diario(){
+  for(x=0;x<=30;x++){
+    var end1 = columnToLetter(3+(21*x))
+    var end2 = columnToLetter(22+(21*x))
+    var end3 = columnToLetter(14+(21*x))
+    var faixa = Diario.getRange(end3+"4:"+end3).getValues().filter(function(r){ return r[0] != ""}).length+4
+
+    Ref.getRange("B2:U75").copyTo(Diario.getRange(2,3+(21*x)), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+    Diario.getRange(end1+"4:"+end2 + faixa).sort({column: 3+(21*x), ascending: true});
+  };
+}
+
+
+function Criar_Diario_Mes(){
+  /*
+  var nmes = Browser.inputBox("Numero do mês de criação");
+
+  Diario.insertRowsBefore(1,75)
+  Diario.getRange("A2:A75")
+  .mergeVertically()
+  .setHorizontalAlignment('center')
+  .setVerticalAlignment('middle')
+  .setTextRotation(90)
+  .setValue(Mes[nmes-1])
+  .setFontSize(24)
+  .setBackground('#741b47')
+  .setFontWeight('bold')
+  .setFontColor('BACKGROUND');
+  
+  */
+  for(x=0;x<=30;x++){
+    Ref.getRange("B2:U75").copyTo(Diario.getRange(2,3+(21*x)), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false)
+    //Diario.getRange(2,3+(21*x)).setValue(new Date(2022,nmes-1,(x+2)))
+  };
+};
+
+function Registrar_Lote(){
+  var Col=[2,14,3,15,4,5,11,13,12,8]
+  var ul_lote = Lotes.getRange("B800").getNextDataCell(SpreadsheetApp.Direction.UP).getRow()+1
+  Lotes.getRange("B4:L" + (ul_lote-1)).sort({column: 12, ascending: true});
+
+  var ul_novo = Novo.getRange("B800").getNextDataCell(SpreadsheetApp.Direction.UP).getRow()
+  var ult_id =Lotes.getRange(ul_lote-1,12).getValue()
+
+  if (ul_novo>2){
+    var array = Novo.getRange(3,2,ul_novo-2,15).getValues()
+    for(x=3;x<=ul_novo;x++){
+      for (y=0;y<Col.length;y++){
+        Lotes.getRange(ul_lote + (x-3),y+2).setValue(array[x-3][Col[y]-2]);
+      };
+      Lotes.getRange(ul_lote + (x-3),12).setValue(ult_id+1+(x-3));
+    };
+    Novo.getRange("B3:P"+ul_novo).clearContent();
+    Classificar_Rest()
+  };
+};
+
+function Mover_Data(){
+  var dia = new Date(Aberto.getRange("M5").getValue()).getDate();
+  var mes = new Date(Aberto.getRange("M5").getValue()).getMonth();
+
+  var col_mes = 14+(21*(dia-1))
+  var lin_mes = Diario.getRange("A1:A").getValues().map(function(r){ return r[0]}).indexOf(Meses[mes])+3
+
+  var lin = Diario.getRange(lin_mes,col_mes,70,1).getValues().filter(function(r){ return r[0] != ""}).length+lin_mes
+  var end = columnToLetter(col_mes)
+
+  app.setActiveSheet(Diario, true);
+  app.getRange(end + lin).activate();
+};
+
+function Testando_ForEach(){
+  var d1 = new Date()
+  var def = 13
+  var array = []
+  var novos = []
+
+  var l_mes = Diario.getRange("A1:A").getValues().map(function(r){return r[0]}).indexOf(Meses[6]);
+  Logger.log(l_mes)
+  /*
+  var sel = Aberto.getRange("B5:B124").getValues()
+  var novos = sel.reduce(function(ind,x,y){
+    if( x == "SIM"){
+      ind.push(y+5)
+    }
+      return ind
+  },[])
+  
+  var  values = Aberto.getRange(6,13,9,1).getValues(); // push{ID}
+  Logger.log(values)
+
+  for (y=0;y<=values.length-1;y++){
+    array.push(values[y]); // push{resumo principal}
+  }
+
+  Aberto.getRange(3,4,1,array.length).setValues(array)
+  Logger.log(array)
+  */
+
+  var d2 = new Date()
+  Logger.log((d2-d1)/1000)
+
+};
+
+function Enviar_Lote(){
+  var def = 13
+  var ind = []
+  var dia = new Date(Aberto.getRange(5,def).getValue()).getDate();
+  var mes = new Date(Aberto.getRange(5,def).getValue()).getMonth();
+
+  var l_mes = Diario.getRange("A1:A").getValues().map(function(r){return r[0]}).indexOf(Meses[mes])+3;
+  var c_mes = 14+(21*(dia-1));
+  
+  var sel = Aberto.getRange("B5:B124").getValues().reduce(function(ind,x,y){
+    if( x == "SIM"){
+      ind.push(y+5)
+    }
+      return ind
+  },[])
+
+  for(x=0;x<sel.length;x++){
+    var array = []
+    array.push(Aberto.getRange(sel[x],3).getValue()); // push{ID}
+    for (y=0;y<=9;y++){
+      array.push(Aberto.getRange(6+y,def).getValue()); // push{resumo principal}
+    };
+    for (y=0;y<=2;y++){
+      array.push(Aberto.getRange(sel[x],4+y).getValue()); // push{destino,origem,prod}
+    };
+    for (y=0;y<=5;y++){
+      array.push(Aberto.getRange(17+y,def).getValue()); // push{clietne >> NFE}
+    };
+
+    var rept = Aberto.getRange(4,def).getValue();
+    if (rept == 0 || rept == ""){ var rept = 1}
+
+    var lin = Diario.getRange(l_mes,c_mes,70,1).getValues().filter(function(r){ return r[0] != ""}).length+l_mes;
+    for(rep=0;rep<=rept-1;rep++){
+      for (y=0;y<=19;y++){
+        Diario.getRange(lin+rep,c_mes+y-11).setValue(array[y]);
+      };
+    }
+  }
+
+  Aberto.getRange(4,def).setValue(1);
+  Aberto.getRange(6,def,17,1).setValues(Aberto.getRange(6,def+4,17,1).getValues());
+  Aberto.getRange(11,def).setFormula('=IFERROR(VLOOKUP(M9;Caminhões!$B$3:$C;2;0);0)');
+  Aberto.getRange("B5:B124").setValue("NAO")
+};
+
+function Enviar_Lote_Old(){
+  var array = []
+
+  var dia = new Date(Aberto.getRange("K5").getValue()).getDate();
+  var mes = new Date(Aberto.getRange("K5").getValue()).getMonth();
+  var col_mes = 14+(21*(dia-1))
+  var lin_mes = Diario.getRange("A1:A").getValues().map(function(r){return r[0] }).indexOf(Meses[mes])+3
+
+  var col = 3+(21*(dia-1))
+  var lin = Diario.getRange(lin_mes,col_mes,70,1).getValues().filter(function(r){ return r[0] != ""}).length+lin_mes
+  var lin_lote = Aberto.getActiveRange().getRow();
+
+  
+  if(Aberto.getRange("K5").getValue() - Lotes.getRange("W1").getValue() >= 0){
+    if(Aberto.getRange(lin_lote,2).getValue() != 0 && Aberto.getRange(lin_lote,2).getValue() != "ID"){
+    array[0] = Aberto.getRange(lin_lote,2).getValue(); //ID
+    array[1] = Aberto.getRange(6,11,10,1).getValues(); // tabela principal
+    array[2] = Aberto.getRange(lin_lote,3,1,3).getValues(); //destino origem
+    array[3] = Aberto.getRange(17,11,3,1).getValues(); // cliente
+    array[4] = Aberto.getRange(21,11,3,1).getValues(); // NFE
+    Logger.log(array)
+    var rept = Aberto.getRange("K4").getValue();
+    if (rept == 0 || rept == ""){ var rept = 1}
+
+    for(x=0;x<=rept-1;x++){
+       Diario.getRange(lin+x,col).setValue(array[0]);
+      for (y=0;y<=array[1].length;y++){
+        Diario.getRange(lin+x,y+1+col).setValue(array[1][y]);
+      };
+      for (y=0;y<=array[2][0].length;y++){
+        Diario.getRange(lin+x,y+11+col).setValue(array[2][0][y]);
+      };
+      for (y=0;y<=array[3].length;y++){
+        Diario.getRange(lin+x,y+14+col).setValue(array[3][y]);
+      };
+      for (y=0;y<=array[4].length;y++){
+        Diario.getRange(lin+x,y+17+col).setValue(array[4][y]);
+      };
+    };
+
+    Aberto.getRange("K4").setValue(1);
+    Aberto.getRange("K6:K10").clearContent();
+    Aberto.getRange("K12:K23").clearContent();
+
+    }else{
+      Browser.msgBox("Foi selecionado uma linha não valida, ação cancelada")
+    }
+  }else{
+    Browser.msgBox("Foi inserido uma data antiga, ação cancelada")    
+  };
+};
+
+function Mover_Historico(){
+  var saldo = Aberto.getRange(lin_lote,8).getValue();
+  if(saldo <=0 ){
+    var ind = Lotes.getRange(1,12,20,1).getValues().map(function(r){return r[0]}).indexOf(array[0])+1
+    var l_hist = Hist.getRange("B2").getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow()+1;
+    Hist.getRange(l_hist,2,1,11).setValues(Lotes.getRange(ind,2,1,11).getValues());
+    Lotes.getRange(ind,2,1,11).clearContent();
+
+    var l_lote = Lotes.getRange("B800").getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+    Lotes.getRange("B4:L" + l_lote).sort({column: 12, ascending: true});
+  };
+};
+
+function Format_Condicional(){
+  var formats = Diario.getConditionalFormatRules();
+    for(x=2;x<=31;x++){
+
+    var end = columnToLetter(6+(21*(x-1)))
+    var end2 = columnToLetter(9+(21*(x-1)))
+
+    //AG TROCA ----------------------------------------------------------------------------------------------------
+    formats.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([Diario.getRange(end+'1:'+end), Diario.getRange(end2+'1:'+end2)])
+    .whenFormulaSatisfied('=$'+end+'1="AG TROCA"')
+    .setBold(true)
+    .setBackground('#F6B26B')
+    .build());
+    Diario.setConditionalFormatRules(formats);
+    
+    var end = columnToLetter(3+(21*(x-1)))
+    var end2 = columnToLetter(22+(21*(x-1)))
+    var end3 = columnToLetter(6+(21*(x-1)))
+
+    //MANISFETADO ----------------------------------------------------------------------------------------------------
+    formats.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([Diario.getRange(end+'1:'+end2)])
+    .whenFormulaSatisfied('=$'+end3+'1="MANIFESTADO"')
+    .setBackground('#6AA84F')
+    .build());
+    Diario.setConditionalFormatRules(formats);
+
+    //CANCELADO ----------------------------------------------------------------------------------------------------
+    formats.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([Diario.getRange(end+'1:'+end2)])
+    .whenFormulaSatisfied('=$'+end3+'1="CANCELAR"')
+    .setBackground('#ff0000')
+    .build());
+    Diario.setConditionalFormatRules(formats);
+    Logger.log(x+" OK!")
+  };
+};
+
+function Colocando_Formula(){
+  var Texto = "="
+  for(x=1;x<=31;x++){
+    var col_dia = 3+(21*(x-1))
+    var col_dia2 = 9+(21*(x-1))
+    var end = columnToLetter(col_dia)
+    var end2 = columnToLetter(col_dia2)
+    Texto += '+SUMIF(Diário!'+end+':'+end+ ';B5;Diário!'+end2+':'+end2+')'
+  }
+  
+  Aberto.getRange("G5").setFormula(Texto);
+};
+
+==================================================================================================================================================================
+
+function autofill() {
+  var app1 = SpreadsheetApp.getActive();
+  app1.getRange('B9:V9').autoFill(spreadsheet.getRange('B9:V87'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+};
+
+function classificando() {
+  var app1 = SpreadsheetApp.getActive();
+  app1.getRange('B6:L6').activate();
+  spreadsheet.getActiveRangeList().clear({contentsOnly: true, skipFilteredRows: true});
+  spreadsheet.getRange('B3:L42').activate();
+  spreadsheet.getActiveRange().offset(1, 0, spreadsheet.getActiveRange().getNumRows() - 1).sort({column: 12, ascending: true});
+};
+
+function copiando() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AO:AO').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getActiveSheet().insertColumnsBefore(spreadsheet.getActiveRange().getColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, 0, spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getActiveSheet().insertColumnsBefore(spreadsheet.getActiveRange().getColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, 0, spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getRange('AQ2').activate();
+  spreadsheet.getRange('W2:AO73').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  spreadsheet.getRange('AP:AP').activate();
+  spreadsheet.getActiveSheet().setColumnWidth(42, 20);
+  spreadsheet.getActiveRangeList().clearFormat();
+  spreadsheet.getRange('BI:BI').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getRange('BJ:BK').activate();
+  spreadsheet.getActiveRangeList().clearFormat();
+};
+
+function inserirlinhaacima() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('2:18').activate();
+  spreadsheet.getActiveSheet().insertRowsBefore(spreadsheet.getActiveRange().getRow(), 17);
+  spreadsheet.getActiveRange().offset(0, 0, 17, spreadsheet.getActiveRange().getNumColumns()).activate();
+  spreadsheet.getActiveRangeList().clearFormat();
+  spreadsheet.getRange('C9').activate();
+};
+
+function inserircolunas() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('BM:BP').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 4);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 4).activate();
+  spreadsheet.getRange('BM:BT').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 8);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 8).activate();
+  spreadsheet.getRange('BO7').activate();
+};
+
+function mes_nome() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('A2:A73').activate()
+  .mergeVertically();
+  spreadsheet.getActiveRangeList().setHorizontalAlignment('center')
+  .setVerticalAlignment('middle')
+  .setTextRotation(90);
+  spreadsheet.getCurrentCell().setValue('JULHO');
+  spreadsheet.getActiveRangeList().setFontSize(24)
+  .setBackground('#741b47')
+  .setFontWeight('bold')
+  .setFontColor('BACKGROUND');
+  spreadsheet.getRange('E7').activate();
+};
+
+function formula1() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('G5').activate();
+  spreadsheet.getCurrentCell().setFormula('=SOMASE(\'Diário\'!C:C;B5;\'Diário\'!I:I)+5')
+  .setFormula('=SOMASE(\'Diário\'!C:C;B5;\'Diário\'!I:I)');
+  spreadsheet.getRange('G6').activate();
+};
+
+function autofit() {
+  Diario.autoResizeColumns(1,650);
+};
+
+function formatvende() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('C2:V20').activate();
+  var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
+  .setRanges([spreadsheet.getRange('C2:V20')])
+  .whenCellNotEmpty()
+  .setBackground('#B7E1CD')
+  .build());
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  
+  conditionalFormatRules.splice(conditionalFormatRules.length - 1, 1, SpreadsheetApp.newConditionalFormatRule()
+  .setRanges([spreadsheet.getRange('C2:V20')])
+  .whenFormulaSatisfied('=$F2="MANIFESTADO"')
+  .setBackground('#6AA84F')
+  .build());
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+};
+
+function corvermelha() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('F5').activate();
+  spreadsheet.getActiveRangeList().setBackground('#ff0000');
+};
+
+function excluir(){
+  var format = Diario.getConditionalFormatRules();
+  Logger.log(Diario.getConditionalFormatRules().length)
+  format.splice(0,Diario.getConditionalFormatRules().length);
+  Diario.setConditionalFormatRules(format);
+  SpreadsheetApp.flush();
+}
+
+function excluirformat() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var sheet = spreadsheet.getActiveSheet();
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).activate();
+  spreadsheet.setCurrentCell(spreadsheet.getRange('DR1'));
+
+  var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+};
+
+function tirarvalid() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AC:AE').activate();
+  spreadsheet.getRange('AC1:AE225').clearDataValidations();
+};
