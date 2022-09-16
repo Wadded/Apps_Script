@@ -1,0 +1,26 @@
+//CONSTANTES ========================================================================================================
+const cLOTES = 19
+const clLOTES = "T"
+const aMES = 90 //altura (linhas) do mes diário
+const cMES = 20 //comprimento (colunas) do mes diário
+
+Meses=["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"]
+alfa =["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+
+//SHEETS ========================================================================================================
+let app = SpreadsheetApp.getActiveSpreadsheet();
+let d_t = app.getSheetByName("div_teste");
+let param = app.getSheetByName("Auxiliar");
+let Divulga = app.getSheetByName("Divulga");
+let Novo = app.getSheetByName("Registrar Lote");
+let Cot = app.getSheetByName("Cotação");
+let Lotes = app.getSheetByName("Lotes");
+let Aberto = app.getActiveSheet();
+let Embar = app.getSheetByName("Embarcadores");
+let Hist = app.getSheetByName("Histórico");
+let Diario = app.getSheetByName("Diario");
+let Ref = app.getSheetByName("Ref0");
+let Logs = app.getSheetByName("Logs");
+let Relatorio = app.getSheetByName("Relatório");
+let ur = app.getSheetByName("dbUranio");
+let appteste = app.getSheetByName("DiárioParaTestes");
