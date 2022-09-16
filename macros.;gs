@@ -1,0 +1,378 @@
+function autofill() {
+  var app1 = SpreadsheetApp.getActive();
+  app1.getRange('B9:V9').autoFill(spreadsheet.getRange('B9:V87'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+};
+
+function classificando() {
+  var app1 = SpreadsheetApp.getActive();
+  app1.getRange('B6:L6').activate();
+  spreadsheet.getActiveRangeList().clear({contentsOnly: true, skipFilteredRows: true});
+  spreadsheet.getRange('B3:L42').activate();
+  spreadsheet.getActiveRange().offset(1, 0, spreadsheet.getActiveRange().getNumRows() - 1).sort({column: 12, ascending: true});
+};
+
+function copiando() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AO:AO').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getActiveSheet().insertColumnsBefore(spreadsheet.getActiveRange().getColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, 0, spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getActiveSheet().insertColumnsBefore(spreadsheet.getActiveRange().getColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, 0, spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getRange('AQ2').activate();
+  spreadsheet.getRange('W2:AO73').copyTo(spreadsheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
+  spreadsheet.getRange('AP:AP').activate();
+  spreadsheet.getActiveSheet().setColumnWidth(42, 20);
+  spreadsheet.getActiveRangeList().clearFormat();
+  spreadsheet.getRange('BI:BI').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 1);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 1).activate();
+  spreadsheet.getRange('BJ:BK').activate();
+  spreadsheet.getActiveRangeList().clearFormat();
+};
+
+function inserirlinhaacima() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('2:18').activate();
+  spreadsheet.getActiveSheet().insertRowsBefore(spreadsheet.getActiveRange().getRow(), 17);
+  spreadsheet.getActiveRange().offset(0, 0, 17, spreadsheet.getActiveRange().getNumColumns()).activate();
+  spreadsheet.getActiveRangeList().clearFormat();
+  spreadsheet.getRange('C9').activate();
+};
+
+function inserircolunas() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('BM:BP').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 4);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 4).activate();
+  spreadsheet.getRange('BM:BT').activate();
+  spreadsheet.getActiveSheet().insertColumnsAfter(spreadsheet.getActiveRange().getLastColumn(), 8);
+  spreadsheet.getActiveRange().offset(0, spreadsheet.getActiveRange().getNumColumns(), spreadsheet.getActiveRange().getNumRows(), 8).activate();
+  spreadsheet.getRange('BO7').activate();
+};
+
+function mes_nome() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('A2:A73').activate()
+  .mergeVertically();
+  spreadsheet.getActiveRangeList().setHorizontalAlignment('center')
+  .setVerticalAlignment('middle')
+  .setTextRotation(90);
+  spreadsheet.getCurrentCell().setValue('JULHO');
+  spreadsheet.getActiveRangeList().setFontSize(24)
+  .setBackground('#741b47')
+  .setFontWeight('bold')
+  .setFontColor('BACKGROUND');
+  spreadsheet.getRange('E7').activate();
+};
+
+function formula1() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('G5').activate();
+  spreadsheet.getCurrentCell().setFormula('=SOMASE(\'Diário\'!C:C;B5;\'Diário\'!I:I)+5')
+  .setFormula('=SOMASE(\'Diário\'!C:C;B5;\'Diário\'!I:I)');
+  spreadsheet.getRange('G6').activate();
+};
+
+function autofit() {
+  Diario.autoResizeColumns(1,650);
+};
+
+function formatvende() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('C2:V20').activate();
+  var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.push(SpreadsheetApp.newConditionalFormatRule()
+  .setRanges([spreadsheet.getRange('C2:V20')])
+  .whenCellNotEmpty()
+  .setBackground('#B7E1CD')
+  .build());
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  
+  conditionalFormatRules.splice(conditionalFormatRules.length - 1, 1, SpreadsheetApp.newConditionalFormatRule()
+  .setRanges([spreadsheet.getRange('C2:V20')])
+  .whenFormulaSatisfied('=$F2="MANIFESTADO"')
+  .setBackground('#6AA84F')
+  .build());
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+};
+
+function corvermelha() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('F5').activate();
+  spreadsheet.getActiveRangeList().setBackground('#ff0000');
+};
+
+function excluirformat() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var sheet = spreadsheet.getActiveSheet();
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).activate();
+  spreadsheet.setCurrentCell(spreadsheet.getRange('DR1'));
+
+  var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(0, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+}
+
+function tirarvalid() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AC:AE').activate();
+  spreadsheet.getRange('AC1:AE225').clearDataValidations();
+};
+
+function bonny() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('D4').activate();
+  var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(conditionalFormatRules.length - 1, 1, SpreadsheetApp.newConditionalFormatRule()
+  .setRanges([spreadsheet.getRange('D2:D245')])
+  .whenFormulaSatisfied('=$D2="Falta"')
+  .setBackground('#FF0000')
+  .build());
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(conditionalFormatRules.length - 1, 1, SpreadsheetApp.newConditionalFormatRule()
+  .setRanges([spreadsheet.getRange('D2:D245')])
+  .whenFormulaSatisfied('=$D2="Falta"')
+  .setBackground('#FF0000')
+  .setFontColor('#FFFFFF')
+  .build());
+  
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(conditionalFormatRules.length - 1, 1, SpreadsheetApp.newConditionalFormatRule()
+  .setRanges([spreadsheet.getRange('D2:D245')])
+  .whenFormulaSatisfied('=$D2="Falta"')
+  .setBold(true)
+  .setBackground('#FF0000')
+  .setFontColor('#FFFFFF')
+  .build());
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+};
+
+function classificar2col() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('B3:S21').activate();
+  spreadsheet.setCurrentCell(spreadsheet.getRange('S3'));
+  spreadsheet.getActiveRange().offset(1, 0, spreadsheet.getActiveRange().getNumRows() - 1).sort([{column: 18, ascending: false}, {column: 3, ascending: true}]);
+
+};
+
+function removeDupl() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('V6:X8').activate();
+  spreadsheet.getActiveRange().removeDuplicates().activate();
+  spreadsheet.getActiveRange().removeDuplicates().activate();
+  spreadsheet.getRange('V6:V8').activate();
+};
+
+function mostraOculta() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('M:M').activate();
+  spreadsheet.getActiveSheet().showColumns(11, 1)
+  .hideColumns(spreadsheet.getActiveRange().getColumn(), spreadsheet.getActiveRange().getNumColumns());
+  spreadsheet.getRange('M:M').activate();
+  spreadsheet.getActiveSheet().showColumns(11, 1);
+  spreadsheet.getRange('L3').activate();
+};
+
+function formula2() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('I7').activate();
+  spreadsheet.getCurrentCell().setFormula('=SOMASE(Diário!P4:P93;5;Diário!I4:I93)')
+  .setFormula('=SOMASE(\'Diário\'!P4:P93;B7;\'Diário\'!I4:I93)')
+  .setFormula('=SOMASE(Diário!$P$4:$P$93;B7;Diário!$I$4:$I$93)');
+  spreadsheet.getActiveRange().autoFill(spreadsheet.getRange('I7:I12'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  spreadsheet.getRange('H7:H12').activate();
+};
+
+function textalignleft() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('SO4:SZ24').activate();
+  spreadsheet.getActiveRangeList().setHorizontalAlignment('left');
+  spreadsheet.getRange('SW7').activate();
+};
+
+
+
+
+
+
+
+
+function replace() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var sheet = spreadsheet.getActiveSheet();
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).activate();
+  spreadsheet.setCurrentCell(spreadsheet.getRange('TH1'));
+};
+
+function duplicarExcluirSheet() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('G11').activate();
+  spreadsheet.duplicateActiveSheet();
+  spreadsheet.getActiveSheet().setName('NovoNome');
+  spreadsheet.deleteActiveSheet();
+};
+
+function ExcluirFormato() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('SM:TF').activate();
+  var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(142, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(7, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(6, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(5, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+  conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(4, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+};
+
+
+
+
+function soma() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('H23').activate();
+  spreadsheet.getCurrentCell().setFormula('=SOMA(I15:I20)');
+
+
+
+  
+};
+
+function removeDataValid() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('E4:F92').activate();
+  spreadsheet.getRange('E4:F92').clearDataValidations();
+};
+
+function Conta_Format(){
+  var format = Diario.getConditionalFormatRules();
+  x=Diario.getConditionalFormatRules().length
+  Logger.log(x)
+  format.splice(1, x);
+  Diario.setConditionalFormatRules(format);
+}
+
+
+
+function clearFormatValues() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AR:AR').activate();
+  spreadsheet.getActiveRangeList().clearFormat()
+  .clear({contentsOnly: true, skipFilteredRows: true});
+};
+
+function redimensionarColuna() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AN:AO').activate();
+  spreadsheet.getActiveSheet().setColumnWidths(40,2,55);
+};
+
+function setFormatNumbe() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AN:AO').activate();
+  spreadsheet.getActiveRangeList().setNumberFormat('0')
+  .setNumberFormat('0');
+};
+
+
+function excluirFormat() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('C:M').activate();
+  var conditionalFormatRules = spreadsheet.getActiveSheet().getConditionalFormatRules();
+  conditionalFormatRules.splice(21, 1);
+  spreadsheet.getActiveSheet().setConditionalFormatRules(conditionalFormatRules);
+};
+
+
+
+
+
+function removeCorAlt() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('BN4:CG93').activate();
+  var banding = spreadsheet.getRange('BN4:CG93').getBandings()[0];
+  banding.remove();
+
+  
+};
+
+function removeDenovo() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var banding = spreadsheet.getRange('ET4:FM75').getBandings()[0];
+  banding.remove();
+  spreadsheet.getRange('ET4').activate();
+
+
+
+
+
+
+
+};
+
+function remove2() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('C4:V50').activate();
+  var banding = spreadsheet.getRange('C4:V50').getBandings()[0];
+  banding.remove();
+};
+
+
+function removeDuplicate2() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('AB6:AG36').activate();
+  spreadsheet.getActiveRange().removeDuplicates([28, 29, 31, 32]).activate();
+};
+
+function autoFill3() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('L160').activate();
+  spreadsheet.getActiveRange().autoFill(spreadsheet.getRange('L150:L160'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  spreadsheet.getRange('N159:O159').activate();
+  spreadsheet.getActiveRange().autoFill(spreadsheet.getRange('N147:O159'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  spreadsheet.getRange('R160').activate();
+  spreadsheet.getActiveRange().autoFill(spreadsheet.getRange('R149:R160'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  spreadsheet.getRange('R149:R160').activate();
+  spreadsheet.setCurrentCell(spreadsheet.getRange('R160'));
+};
+
+
+function formulas() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('J3').activate();
+  spreadsheet.getCurrentCell().setFormula('=CONT.VALORES(Diário!D4:D17)');
+  spreadsheet.getRange('J4').activate();
+  spreadsheet.getCurrentCell().setFormula('=Diário!D95+Diário!X95');
+  spreadsheet.getRange('J5').activate();
+  spreadsheet.getCurrentCell().setFormula('=J4')
+  .setFormula('=(J4*60)/1000');
+  spreadsheet.getRange('J8').activate();
+  spreadsheet.getCurrentCell().setFormula('=SOMASE(Diário!P4:P18;"Milho";Diário!I4:I18)');
+  spreadsheet.getRange('I8').activate();
+};
+
+function setFormula1() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('J8').activate();
+  spreadsheet.getCurrentCell().setFormula('=(SOMASE(Diario!P$4:P$93;B8;Diario!I$4:I$93))/($J$5*1000)');
+  spreadsheet.getActiveRange().autoFill(spreadsheet.getRange('J8:J12'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  spreadsheet.getRange('J10').activate();
+
+
+};
