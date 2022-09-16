@@ -1,0 +1,224 @@
+function teste1(){
+  var ul_lote = Lotes.getRange("B800").getNextDataCell(SpreadsheetApp.Direction.UP).getRow()+1
+  Lotes.getRange("B6:"+clLOTES+ul_lote).sort({column: 2, ascending: true});
+  var ult_id = Lotes.getRange(ul_lote-1,2).getValue()+1;
+  var c = 5
+}
+
+function Criar_Divulga2(){
+  const cl = 13
+  app.getActiveSheet().showColumns(cl);
+
+  //filtro e tratamento de dados ------------------------------------------------------------------------------------
+  Divulga.getRange("AA6:AG").clearContent();
+  Divulga.getRange("M9:M").clearContent();
+
+  var sel = Divulga.getRange("C6:I").getDisplayValues().reduce(function(ind,x,y){
+    if(x[0] == "SIM" && Divulga.getRange(y+6,2).getBackground() != "#cc0000"){
+      ind.push(x)
+    }
+      return ind
+  },[]);
+  
+  Divulga.getRange(6,27,sel.length,sel[0].length).setValues(sel);
+  Divulga.getRange(6,27,sel.length,sel[0].length).sort([{column: 30, ascending: true}]);
+  Divulga.getRange(6,27,sel.length,sel[0].length).removeDuplicates([28, 29, 31, 32]);
+
+  //criando lista de divulgação ------------------------------------------------------------------------------------
+  var lin = Divulga.getRange(1000,28).getNextDataCell(SpreadsheetApp.Direction.UP).getRow()-5;
+  dados = Divulga.getRange(6,28,lin,sel[0].length-1).getDisplayValues();
+  lin = Divulga.getRange(1000,cl).getNextDataCell(SpreadsheetApp.Direction.UP).getRow()+1;
+
+  if(dados.length>0){
+    Divulga.getRange(lin,cl).setValue("➖➖➖➖➖➖➖➖➖➖➖➖")
+    Divulga.getRange(lin+1,cl).setValue(dados[0][2]+" >>>>>>>>>>>>>>>>>")
+    Divulga.getRange(lin+3,cl).setValue(dados[0][0] +" P/ "+ dados[0][1] + " ("+dados[0][4] +")");
+    Divulga.getRange(lin+4,cl).setValue("- "+ dados[0][5])
+    lin += 6
+
+    for(x=1;x<dados.length;x++){
+      if(dados[x][2] != dados[x-1][2]){
+        Divulga.getRange(lin,cl).setValue("➖➖➖➖➖➖➖➖➖➖➖➖")
+        Divulga.getRange(lin+1,cl).setValue(dados[x][2]+" >>>>>>>>>>>>>>>>>")
+        lin +=3
+      };
+  
+      Divulga.getRange(lin,cl).setValue(dados[x][0] +" P/ "+ dados[x][1] + " ("+dados[x][4] +")")
+      Divulga.getRange(lin+1,cl).setValue("- "+ dados[x][5])
+      lin += 3
+    };
+
+    var ult = param.getRange("M500").getNextDataCell(SpreadsheetApp.Direction.UP).getRow()
+    Divulga.getRange(lin,cl).setValue("➖➖➖➖➖➖➖➖➖➖➖➖")
+    Divulga.getRange(lin+1,cl,ult-3,1).setValues(param.getRange(4,13,ult-3,1).getValues())
+    lin += ult-3
+  };
+  
+  Divulga.getRange("C6:C").setValue("NAO")
+  app.getActiveSheet().hideColumns(cl,1)
+};
+
+function Registrar_Novos_Lotes(){
+  Col = [0,12,1,13,2,10,15,16,3,4,9,11,17,18]
+
+  //Substitui produto pelo produto + símbolo do produto --------------------------------------------------------------
+  subs = param.getRange("Q4:R").getValues().filter(function(r){return r[0] != ""});
+  for(x=0;x<subs.length;x++){
+    Lotes.getRange("Z6:Z26").createTextFinder(subs[x][0]).replaceAllWith(subs[x][1])
+  };
+
+  //Aqui é a brincadeira de verdade ----------------------------------------------------------------------------------
+  var ul_lote = Lotes.getRange("B800").getNextDataCell(SpreadsheetApp.Direction.UP).getRow()+1
+  Lotes.getRange("B6:"+clLOTES+ul_lote).sort({column: 2, ascending: true});
+  var ult_id = Lotes.getRange(ul_lote-1,2).getValue()+1;
+
+  data = Lotes.getRange("X6:AP26").getValues().filter(function(r){return r[0] != ""});
+  if (data.length>0){
+    for(x=0;x<data.length;x++){
+      Lotes.getRange(ul_lote + x,2).setValue(ult_id+x);
+      for (y=0;y<=9;y++){
+        Lotes.getRange(ul_lote + x,y+4).setValue(data[x][Col[y]]);
+      };
+      for (y=10;y<=11;y++){
+        Lotes.getRange(ul_lote + x,y+6).setValue(data[x][Col[y]]);
+      };
+      Lotes.getRange(ul_lote + x,19).setValue(data[x][17]);
+      Lotes.getRange(ul_lote + x,20).setValue(data[x][18]);
+    };
+    
+    //Finish Him !! --------------------------------------------------------------------------------------------------
+    Classificar_Dias_Restantes()
+    Lotes.getRange("X6:AP26").clearContent();
+    app.toast("Enviado "+data.length+" para os lotes com sucesso!","LOTES REGISTRADOS",2 );
+  }else{
+    app.toast("Não existem lotes novos para serem registrados","AÇÃO CANCELADA",2 );
+  };
+};
+
+function Regs_Diario5(def){
+  var id = Embar.getRange(4,def).getValue()
+  var ln = Embar.getRange("B1:B").getValues().map(function(r){return r[0]}).indexOf(id)+1;
+
+  if(id >0 && ln > 0 && Embar.getRange(ln,2).getBackground() != "#cc0000"){
+    valores = Embar.getRange(7,def,14,1).getValues()
+    lote = Embar.getRange(ln,2,1,8).getDisplayValues()[0]
+
+    for(x=10;x>=1;x--){
+      lote.splice(1,0,valores[x-1][0])
+    };
+    lote.splice(16,0,valores[11][0])
+    for(x=12;x<=13;x++){
+      lote.push(valores[x][0])
+    };
+
+    if(lote[11] == "SIM"){
+      lote[6] += lote[7]
+      lote.splice(7,1,"SIM")
+    }else{lote.splice(7,1,"NÃO")}
+    lote.splice(11,1)
+
+    var mes = new Date(Embar.getRange(6,def).getValue()).getMonth();
+    var l_mes = Diario.getRange("A1:A").getValues().map(function(r){return r[0]}).indexOf(Meses[mes])+3;
+    var c_mes = 3+(21*(new Date(Embar.getRange(6,def).getValue()).getDate()-1));
+    var lin = Diario.getRange(l_mes,c_mes,aMES,1).getValues().filter(function(r){return r[0] != ""}).length+l_mes;
+
+    for (y=0;y<=19;y++){
+      Diario.getRange(lin,c_mes+y).setValue(lote[y]);
+    };
+    //Diario.getRange(l_mes,c_mes,aMES,cMES).sort({column: c_mes+3, ascending: false});
+    app.toast("ID "+ id +" foi registrado no Diário com sucesso !","REGISTRO REALIZADO !",3);
+  }else{
+    app.toast("ID incorreto ou lote já finalizado","AÇÃO CANCELADA",3);
+  };
+};
+
+function Classificar_Dias_Restantes(){
+  Lotes.getRange("L160").autoFill(Lotes.getRange("L6:L160"), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  Lotes.getRange("N160:O160").autoFill(Lotes.getRange('N6:O160'), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  Lotes.getRange("R150").autoFill(Lotes.getRange("R6:R150"), SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES);
+  Lotes.getRange("B6:"+clLOTES).sort([{column: 3, ascending: true},{column: 17, ascending: true}]);
+};
+
+function Mover_Para_Dia(){//apenas move o usuário para a data selecionada no Diário
+  var dia = new Date(Aberto.getRange("Q5").getValue()).getDate();
+  var mes = new Date(Aberto.getRange("Q5").getValue()).getMonth();
+  
+  var col_mes = 6+(21*(dia-1))
+  var lin_mes = Diario.getRange("A1:A").getValues().map(function(r){return r[0]}).indexOf(Meses[mes])+3
+  var lin = Diario.getRange(lin_mes,col_mes,aMES,1).getValues().filter(function(r){return r[0] != ""}).length+lin_mes
+
+  app.setActiveSheet(Diario, true);
+  app.getRange(columnToLetter(col_mes) + lin).activate();
+}
+
+function Format_Condicional(){
+  /*
+  var format = Diario.getConditionalFormatRules();
+  x=Diario.getConditionalFormatRules().length
+  format.splice(1, x);
+  Diario.setConditionalFormatRules(format);
+  */
+  
+  var formats = Diario.getConditionalFormatRules();
+  for(x=1;x<=31;x++){ //x = dia do mês
+    var end = columnToLetter(6+(21*(x-1)))
+    var end2 = columnToLetter(9+(21*(x-1)))
+
+    //AG TROCA ----------------------------------------------------------------------------------------------------
+    formats.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([Diario.getRange(end+'1:'+end+'93'), Diario.getRange(end2+'1:'+end2+'93')])
+    .whenFormulaSatisfied('=$'+end+'1="AG TROCA"')
+    .setBold(true)
+    .setBackground('#F6B26B')
+    .build());
+    Diario.setConditionalFormatRules(formats);
+    
+    var end = columnToLetter(3+(21*(x-1)))
+    var end2 = columnToLetter(22+(21*(x-1)))
+    var end3 = columnToLetter(6+(21*(x-1)))
+
+    //MANISFETADO ----------------------------------------------------------------------------------------------------
+    formats.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([Diario.getRange(end+'1:'+end2+'93')])
+    .whenFormulaSatisfied('=$'+end3+'1="MANIFESTADO"')
+    .setBackground('#6AA84F')
+    .build());
+    Diario.setConditionalFormatRules(formats);
+
+    //CANCELADO ----------------------------------------------------------------------------------------------------
+    formats.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([Diario.getRange(end+'1:'+end2+'93')])
+    .whenFormulaSatisfied('=$'+end3+'1="CANCELAR"')
+    .setBackground('#ff0000')
+    .build());
+    Diario.setConditionalFormatRules(formats);
+
+    var end = columnToLetter(4+(21*(x-1)))
+    //bounny FALTA  -------------------------------------------------------------------------------------------------
+    formats.push(SpreadsheetApp.newConditionalFormatRule()
+    .setRanges([Diario.getRange(end+'1:'+end+'93')])
+    .whenFormulaSatisfied('=$'+end+'1="FALTA"')
+    .setBackground('#FF0000')
+    .setFontColor('#FFFFFF')
+    .setBold(true)
+    .build());
+    Diario.setConditionalFormatRules(formats);
+    Logger.log(x+" OK!")
+  };
+};
+
+function Copiar_Formula1(){
+  var fn = aMES+3
+  var Texto = "="
+  for(x=1;x<=31;x++){
+    var d = columnToLetter(9+(21*(x-1)))
+    var d2 = columnToLetter(19+(21*(x-1)))
+    var d3 = columnToLetter(20+(21*(x-1)))
+    Texto +='+(((SOMA(Diario!'+d2+'4:'+d2+fn+')-SOMA(Diario!'+d3+'101:'+d3+fn+'))*SOMA(Diario!'+d+'4:'+d+fn+')*0,001)'
+  }
+  app.getRange("I22").setFormula(Texto);
+}
+
+
+
+
